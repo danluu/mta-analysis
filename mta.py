@@ -66,14 +66,29 @@ def get_files_by_day(day_requested):
 
 trips = {}
 
+def add_station_time(trips, last_window, trip_id, stop_id, stop_time):
+    if stop_id not in trips[trip_id]:
+        trips[trip_id][stop_id] = [stop_time]
+        return
+
+    if stop_id in last_window or len(trips[trip_id][stop_id]) == 0:
+        trips[trip_id][stop_id][-1] = stop_time
+    else:
+        trips[trip_id][stop_id].append(stop_time)
+
 def get_station_times(filenames):
     changed_direction = set()
+
+    cur_window = set()
+    last_window = set()
     for filename in filenames:
         feed = get_feed(filename)
         # debug check to make sure we don't see the same trip_id twice in the same file.
         seen_trip_ids = set()
 
+
         for entity in feed.entity:
+            # entity is a list of predicted times for a trip Id.
             if is_1_train(entity):
                 trip_update = entity.trip_update
                 trip_id = trip_update.trip.trip_id
@@ -88,7 +103,8 @@ def get_station_times(filenames):
                 # Trains generally don't change direction, but on rare occasion do
                 cur_direction = trip_update.trip.Extensions[nyct_subway_pb2.nyct_trip_descriptor].direction
                 if 'direction' in trips[trip_id]:
-                    assert(trips[trip_id]['direction'] == cur_direction)
+                    # assert(trips[trip_id]['direction'] == cur_direction)
+                    pass
                 else:
                     trips[trip_id]['direction'] = cur_direction
 
@@ -96,18 +112,16 @@ def get_station_times(filenames):
                 seen_trip_ids.add(trip_id)
                 for stop_time in trip_update.stop_time_update:
                     stop_id = stop_time.stop_id
-
-                    trips[trip_id][stop_id] = stop_time.arrival.time
+                    cur_window.add(stop_id)
 
                     # Note sure if this assert is true, but we've never seen it violated
                     arrival_time = stop_time.arrival.time
                     departure_time = stop_time.departure.time
 
                     if arrival_time != 0:
-                        trips[trip_id][stop_id] = arrival_time
-
-                    if departure_time != 0:
-                        trips[trip_id][stop_id] = departure_time
+                        add_station_time(trips, last_window, trip_id, stop_id, arrival_time)
+                    elif departure_time != 0:
+                        add_station_time(trips, last_window, trip_id, stop_id, departure_time)
 
                     #
                     if departure_time != 0 and arrival_time != 0:
@@ -116,9 +130,16 @@ def get_station_times(filenames):
                             # print(stop_time.stop_id)
                             # We only appear to have a delta for some stations. We don't know why.
                    # assert(arrival_time == 0 or departure_time == 0 or stop_time.arrival.time == stop_time.departure.time)
+            last_window = cur_window
     return trips
 
-# select day in yyyy-mm-dd format
+# select day in yyyy-mm-dd forma4t
 day_requested = sys.argv[1]
 day_files = get_files_by_day(day_requested)
 times = get_station_times(day_files)
+print(times)
+
+# for trip_id, station_times in times.items():
+#     for station_id, estimated_times in station_times.items():
+#         if len(estimated_times) != 1:
+#             print(trip_id, station_id, estimated_times)
