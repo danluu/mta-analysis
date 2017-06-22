@@ -5,8 +5,10 @@ import json
 # Stop id: 635 R20S L03S D13S A31S is 14th (635N/635S)
 # Stop id: 12
 
-# TODO: make this less... bad.
-# TODO: note that this doesn't check for the station.
+# TODO: we pretend that arrival time and deperature time are always the same because they're listed as the same
+# in most cases. However, they're not always listed as the same. It would be preferable to use real departure and arrival
+# times, but we don't have that data so we ignore it in the few cases where do we do have it.
+
 def is_1_train(item):
     if not item.HasField('trip_update'):
         return False
@@ -57,8 +59,56 @@ def get_feed(filename):
 # readable_gtfs_dump('./mta-files/gtfs-2014-09-17-23-46')
 # get_all_stations()
 
+trips = {}
+
 hacky_predefined_filenames = ['./mta-files/gtfs-2014-09-17-23-41', './mta-files/gtfs-2014-09-17-23-46']
 
-# for filename in hacky_predefined_filenames:
-#     with open(filename)
-#     print(filename)
+for filename in hacky_predefined_filenames:
+    feed = get_feed(filename)
+    # debug check to make sure we don't see the same trip_id twice in the same file.
+    seen_trip_ids = set()
+
+    for entity in feed.entity:
+        if is_1_train(entity):
+            trip_update = entity.trip_update
+            trip_id = trip_update.trip.trip_id
+            if trip_id in seen_trip_ids:
+                print('ERROR: saw trip id twice in same file', trip_id)
+                assert(False)
+
+            if trip_id not in trips:
+                trips[trip_id] = {}
+
+            # Check that no trip_id changes direction
+            cur_direction = trip_update.trip.Extensions[nyct_subway_pb2.nyct_trip_descriptor].direction
+            if 'direction' in trips[trip_id]:
+                assert(trips[trip_id]['direction'] == cur_direction)
+            else:
+                trips[trip_id]['direction'] = cur_direction
+
+
+            seen_trip_ids.add(trip_id)
+            for stop_time in trip_update.stop_time_update:
+                stop_id = stop_time.stop_id
+
+                trips[trip_id][stop_id] = stop_time.arrival.time
+
+                # Note sure if this assert is true, but we've never seen it violated
+                arrival_time = stop_time.arrival.time
+                departure_time = stop_time.departure.time
+
+                if arrival_time != 0:
+                    trips[trip_id][stop_id] = arrival_time
+
+                if departure_time != 0:
+                    trips[trip_id][stop_id] = departure_time
+
+                #
+                if departure_time != 0 and arrival_time != 0:
+                    if stop_time.arrival.time != stop_time.departure.time:
+                        pass
+                        # print(stop_time.stop_id)
+                        # We only appear to have a delta for some stations. We don't know why.
+               # assert(arrival_time == 0 or departure_time == 0 or stop_time.arrival.time == stop_time.departure.time)
+
+print(trips)
