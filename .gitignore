@@ -1,0 +1,6 @@
+mta-env
+mta-files
+output*
+*~
+.idea
+__pycache__
