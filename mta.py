@@ -20,7 +20,7 @@ def is_1_train_at_14th_south():
 
 
 feed = gtfs_realtime_pb2.FeedMessage()
-with open('/Users/danluu/Downloads/gtfs/gtfs-2014-09-17-23-41','rb') as f:
+with open('./mta-files/gtfs-2014-09-17-23-41','rb') as f:
     feed.ParseFromString(f.read())
     for item in feed.entity:
         if is_1_train_at_14th_south():
@@ -31,4 +31,3 @@ with open('/Users/danluu/Downloads/gtfs/gtfs-2014-09-17-23-41','rb') as f:
 
 # entity.trip_update.trip.route_id
 #  Want this to be "1", "2", or "3". Let's say "1".
-
