@@ -8,13 +8,11 @@ import requests
 # TODO: make this less... bad.
 # TODO: note that this doesn't check for the station.
 def is_1_train_at_14th_south():
-    if item.HasField('trip_update'):
-        if item.trip_update.HasField('trip'):
-            if item.trip_update.trip.route_id != '1':
-                return False
-        else:
-            return False
-    else:
+    if not item.HasField('trip_update'):
+        return False
+    if not item.trip_update.HasField('trip'):
+        return False
+    if item.trip_update.trip.route_id != '1':
         return False
     return True
 
