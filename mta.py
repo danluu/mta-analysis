@@ -1,6 +1,13 @@
 import gtfs_realtime_pb2, nyct_subway_pb2
 import json, sys, glob
 
+# Data sources
+#
+# http://data.mytransit.nyc/subway_time/. Has data from Jan 1 2016 until present day
+#
+# http://web.mta.info/developers/MTA-Subway-Time-historical-data.html. Claims to have data from Sep 17 2014 until present day, but most data is missing.
+# Daily dump has 94 days of data starting from Sep 17. 5 min dump has data until Nov 18 2015, but has significant gaps in data.
+
 # Stops with 1 & 2 & 3: Chambers, 14th, 34th, 42nd, 96th.
 # Stop id: 635 R20S L03S D13S A31S is 14th (635N/635S)
 # Stop id: 12
