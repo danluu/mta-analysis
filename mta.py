@@ -7,6 +7,7 @@ import json, sys, glob
 #
 # http://web.mta.info/developers/MTA-Subway-Time-historical-data.html. Claims to have data from Sep 17 2014 until present day, but most data is missing.
 # Daily dump has 94 days of data starting from Sep 17. 5 min dump has data until Nov 18 2015, but has significant gaps in data.
+# Some people have asked about this on the MTA dev mailing list but no one has been able to get a response: https://groups.google.com/forum/#!topic/mtadeveloperresources/9wxXeYwJAMQ.
 
 # Stops with 1 & 2 & 3: Chambers, 14th, 34th, 42nd, 96th.
 # Stop id: 635 R20S L03S D13S A31S is 14th (635N/635S)
