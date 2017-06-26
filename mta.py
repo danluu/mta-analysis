@@ -65,8 +65,6 @@ def get_files_by_day(day_requested):
     day_files = glob.glob(base_file_path + day_requested + "*")
     return day_files
 
-trips = {}
-
 def add_station_time(trips, last_window, trip_id, stop_id, stop_time):
     if stop_id not in trips[trip_id]:
         trips[trip_id][stop_id] = [stop_time]
@@ -78,6 +76,7 @@ def add_station_time(trips, last_window, trip_id, stop_id, stop_time):
         trips[trip_id][stop_id].append(stop_time)
 
 def get_station_times(filenames):
+    trips = {}
     changed_direction = set()
 
     cur_window = set()
