@@ -141,7 +141,7 @@ def get_station_times(filenames):
             last_window = cur_window
     return trips
 
-# select day in yyyy-mm-dd forma4t
+# select day in yyyy-mm-dd format
 day_requested = sys.argv[1]
 day_files = get_files_by_day(day_requested)
 times = get_station_times(day_files)
