@@ -13,6 +13,9 @@ import json, sys, glob
 # Stop id: 635 R20S L03S D13S A31S is 14th (635N/635S)
 # Stop id: 12
 
+# Stop id for 42nd St: 127S
+# Stop id for Chambers: 137S
+
 # TODO: we pretend that arrival time and deperature time are always the same because they're listed as the same
 # in most cases. However, they're not always listed as the same. It would be preferable to use real departure and arrival
 # times, but we don't have that data so we ignore it in the few cases where do we do have it.
@@ -61,16 +64,6 @@ def get_files_by_day(day_requested):
     base_file_path = './mta-files/gtfs-'
     day_files = glob.glob(base_file_path + day_requested + "*")
     return day_files
-
-
-# entity.trip_update.stop_time_update.stop_id
-#  Want this to be 635S
-
-# entity.trip_update.trip.route_id
-#  Want this to be "1", "2", or "3". Let's say "1".
-
-# readable_gtfs_dump('./mta-files/gtfs-2014-09-17-00-01')
-# get_all_stations()
 
 trips = {}
 
@@ -140,6 +133,16 @@ def get_station_times(filenames):
                    # assert(arrival_time == 0 or departure_time == 0 or stop_time.arrival.time == stop_time.departure.time)
             last_window = cur_window
     return trips
+
+# entity.trip_update.stop_time_update.stop_id
+#  Want this to be 635S
+
+# entity.trip_update.trip.route_id
+#  Want this to be "1", "2", or "3". Let's say "1".
+
+# readable_gtfs_dump('./mta-files/gtfs-2014-09-17-00-01')
+# get_all_stations()
+
 
 # select day in yyyy-mm-dd format
 day_requested = sys.argv[1]
